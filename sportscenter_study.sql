@@ -13,6 +13,7 @@ CREATE TABLE members
     phone       VARCHAR(20),
     email       VARCHAR(50),
     region      VARCHAR(10),
+
     join_date   DATE   NOT NULL
 );
 
@@ -71,10 +72,11 @@ INSERT INTO members
     class_days      VARCHAR(10) NOT NULL,
     start_time      TIME        NOT NULL,
     capacity        SMALLINT    NOT NULL,
-    fee             INT         NOT NULL,
+    fee             INT         NOT NULL
  );
 
- INSERT INTO courses (sports_id, course_name, level, class_days, start_time, capacity, fee)
+
+INSERT INTO courses (sports_id, course_name, level, class_days, start_time, capacity, fee)
 VALUES (1, '수영 초급 새벽반', '초급', '월수금', '06:00', 20, 70000);
 INSERT INTO courses (sports_id, course_name, level, class_days, start_time, capacity, fee)
 VALUES (2, '헬스 자유이용', '자유', '매일', '06:00', 50, 50000);
@@ -94,3 +96,51 @@ INSERT INTO lockers VALUES (101, 1, '2026-11-01');
 INSERT INTO lockers VALUES (102, 1, '2026-11-01');
 INSERT INTO lockers VALUES (102, 3, '2026-11-01'); -- 임시회원
 
+
+
+--                26. 11. 17
+
+-- 수상  신청 테이블
+CREATE TABLE enrollments
+(
+   member_id      INT            NOT NULL REFERENCES members(member_id),
+   course_id      INT            NOT NULL REFERENCES courses(course_id),
+   enroll_month   CHAR(7)        NOT NULL,
+   status         VARCHAR(10)    NOT NULL,
+   pay_amount     NUMERIC(10,2)   NOT NULL CHECK (pay_amount >= 0),
+   PRIMARY KEY (member_id, course_id, enroll_month)
+);
+
+INSERT INTO enrollments
+VALUES (1, 1, '2026-11', '수료', 50000);
+
+INSERT INTO enrollments
+VALUES (2, 2, '2026-10', '수료', 70000);
+
+INSERT INTO enrollments
+VALUES (2, 2, '2026-10', '수료', 60000);
+
+
+
+-- 명세표 보고 강사 테이블
+DROP TABLE IF EXISTS instructor CASCADE;
+
+CREATE TABLE instructors
+(
+   instructor_id     SERIAL          PRIMARY KEY,
+   name              VARCHAR(20)     NOT NULL,
+   sports_id          INT             NOT NULL REFERENCES sports (sports_id),
+   phone             VARCHAR(20),
+   hire_date         DATE            NOT NULL
+);
+
+INSERT INTO instructors (name, sport_id, phone, hire_date)
+VALUES
+('홍길동', 1, '010-1234-1234', '2025-01-01'),
+('손흥민', 2, '010-1234-0000', '2025-01-01');
+
+
+-- 테이블 삽입 ALTER TABLE
+
+ALTER TABLE courses
+ADD COLUMN instructor_id INT REFERENCES instructor (instructor_id);
